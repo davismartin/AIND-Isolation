@@ -169,6 +169,82 @@ class MinimaxPlayer(IsolationPlayer):
 
         # Return the best move from the last completed search iteration
         return best_move
+    def findMax(self,game,depth):
+        """
+        Parameters
+        ----------
+        game : isolation.Board
+            An instance of the Isolation game `Board` class representing the
+            current game state
+
+        depth : int
+            Depth is an integer representing the maximum number of plies to
+            search in the game tree before aborting
+
+        Returns
+        -------
+        score: float
+            Current score
+        position: tuple
+            Coordinates of position defaults to (-1,-1) if no legal moves
+        """
+        # Copying to prevent timeouts
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        best_move = (-1,-1)
+
+    def calcMinORMax(self,game,depth):
+        """
+        Parameters
+        ----------
+        game : isolation.Board
+            An instance of the Isolation game `Board` class representing the
+            current game state
+
+        depth : int
+            Depth is an integer representing the maximum number of plies to
+            search in the game tree before aborting
+
+        Returns
+        -------
+        score: float
+            Current score
+        position: tuple
+            Coordinates of position defaults to (-1,-1) if no legal moves
+        """
+        # Copying to prevent timeouts
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        # Determine if current instance is the active_player
+        is_active_player = game.active_player == self
+        best_move = (-1,-1)
+
+        # Determine if min or max needed
+        if is_active_player:
+            func, best_score = max,float("-inf")
+        else:
+            func, best_score = min,float("inf")
+
+        # Base case stop recursing and return best_score and best_move
+        if depth == 0:
+            return self.score(game, self), game.get_player_location(self)
+
+        # Return defaults if no legal move
+        if not game.get_legal_moves():
+            return self.score(game,self),(-1,-1)
+
+        # Find the best score and best move for leaves
+        for move in game.get_legal_moves():
+            poss_move = game.forecast_move(move)
+            score,_ = self.calcMinORMax(poss_move, depth - 1)
+            if func(best_score,score) == score:
+                best_score = score
+                best_move = move
+
+        return best_score, best_move
+
 
     def minimax(self, game, depth):
         """Implement depth-limited minimax search algorithm as described in
@@ -212,8 +288,12 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        _,best_move = self.calcMinORMax(game, depth)
+        print("best_move",best_move)
+
+        return best_move
+
+
 
 
 class AlphaBetaPlayer(IsolationPlayer):
@@ -255,7 +335,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         self.time_left = time_left
 
         # TODO: finish this function!
-        raise NotImplementedError
+        # raise NotImplementedError
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
