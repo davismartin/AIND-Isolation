@@ -265,7 +265,6 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         _,best_move = self.calcMinORMax(game, depth)
-        print("best_move",best_move)
 
         return best_move
 
@@ -371,7 +370,6 @@ class AlphaBetaPlayer(IsolationPlayer):
         # Determine if min or max needed
         if is_active_player:
             func, best_score = max,float("-inf")
-            print("truth", func==max)
         else:
             func, best_score = min,float("inf")
 
