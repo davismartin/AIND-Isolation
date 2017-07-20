@@ -34,8 +34,23 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    w, h = game.width / 2., game.height / 2.
+    y, x = game.get_player_location(player)
+    own_center = float((h - y)**2 + (w - x)**2)
+
+    y, x = game.get_player_location(game.get_opponent(player))
+    opp_center = float((h - y)**2 + (w - x)**2)
+    return float((own_moves**2 - 2*opp_center) - (opp_moves**2 - own_center))
+
+
 
 
 def custom_score_2(game, player):
@@ -60,8 +75,23 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    board = game.height * game.width
+    num_moves = game.move_count/board
+
+    if num_moves > 0.25:
+        score = own_moves - 2*opp_moves
+    else:
+        score = own_moves - opp_moves
+
+    own_post = game.get_player_location(player)
+    opp_post = game.get_player_location(game.get_opponent(player))
+
+    dist_from_opp = ((own_post[0] - opp_post[0])**2 + (own_post[1] - opp_post[1])**2)**0.5
+
+    return float(score / dist_from_opp)
 
 
 def custom_score_3(game, player):
@@ -86,8 +116,9 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves - (2*opp_moves))
 
 
 class IsolationPlayer:
